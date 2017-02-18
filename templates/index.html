@@ -1,6 +1,12 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.12/css/uikit.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.12/js/uikit.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <script>
-    $(document).ready(function() {
+    function get_profile_url(facebook_id) {
+        return 'https://facebook.com/' + facebook_id
+    }
+
+    $(window).ready(function() {
         $('#update_learn').submit(function(event) {
 
             /* prevent form from submitting normally */
@@ -22,11 +28,19 @@
             });
         });
 
-		$.get('matches', function(data, status) {
-			$('#matches').text(data);
-		});
+        $.getJSON('matches', function(data, status) {
+            $('#matches .list li').remove();
+
+            $.each(data, function(key, val) {
+                $('#matches .list').append('<li><a href="' + get_profile_url(val['facebook_id']) + '">' + val['name'] + ' (' + val['score'] + ')</a></li>')
+            });
+        });
 	});
 </script>
+<title>Lang</title>
+
+<div class="uk-container">
+<h1 class="uk-heading-primary">Lang</h1>
 
 <p>Welcome, {{ user.name }}!</p>
 <p>Hometown: {{ user.hometown }}</p>
@@ -38,32 +52,46 @@
 </div>
 {% endfor %}
 
-<div>
-<h2>Languages I know:</h2>
-<ul>
-{% for language in all_languages %}
-<li>{{ language.name }}</li>
-{% endfor %}
-</ul>
-</div>
-
-<div>
-<form action="{{ url_for('update_learn') }}" method="post">
-<h2>Languages I want to learn:</h2>
-<div id="languagesToLearn">
-    <ul class="list">
-        
+<div class="uk-grid uk-grid-match" uk-grid>
+<div class="uk-width-1-3@m">
+    <div class="uk-card uk-card-body uk-card-default">
+    <h2 class="uk-card-title">Languages I know</h2>
+    <ul>
+    {% for language in my_languages %}
+    <li>{{ language.name }}</li>
+    {% endfor %}
     </ul>
+    </div>
 </div>
 
-{% for language in all_languages %}
-<input type="checkbox" value={{ language.id }} name="learnLanguages">{{ language.name }}<br>
-{% endfor %}
-<input type="submit" value="Update" id="update_learn">
-</form>
+<div class="uk-width-1-3@m">
+    <div class="uk-card uk-card-body uk-card-default">
+    <form action="{{ url_for('update_learn') }}" method="post">
+    <h2 class="uk-card-title">Languages I want to learn</h2>
+    <div id="languagesToLearn">
+        <ul class="list">
+            
+        </ul>
+    </div>
+
+    {% for language in all_languages %}
+    <input class="uk-checkbox" type="checkbox" value={{ language.id }} name="learnLanguages">{{ language.name }}<br>
+    {% endfor %}
+    <input type="submit" value="Update" id="update_learn">
+    </form>
+    </div>
 </div>
 
-<h2>Matches</h2>
-<div id='matches'>
-No matches found.
+<div class="uk-width-1-3@m">
+    <div class="uk-card uk-card-body uk-card-default">
+    <h2 class="uk-card-title">Matches</h2>
+    <div id='matches'>
+        <ul class="list">
+
+        </ul>
+    </div>
+    </div>
+</div>
+</div>
+
 </div>
