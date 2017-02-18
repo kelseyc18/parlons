@@ -23,6 +23,11 @@ facebook = oauth.remote_app('facebook',
     request_token_params={'scope': ['email', 'user_likes']}
 )
 
+engine = create_engine('sqlite:///database.db')
+Base.metadata.bind = engine
+Base.metadata.create_all(engine)
+DBSession = sessionmaker(bind=engine, autoflush=False)
+session = DBSession()
 
 @app.route('/')
 def index():
@@ -45,7 +50,8 @@ def facebook_authorized(resp):
             request.args['error_description']
         )
     session['oauth_token'] = (resp['access_token'], '')
-    me = facebook.get('/me?fields=id,name,languages')
+    me = facebook.get('/me?fields=id,name,languages,email')
+    
     return render_template('index.html', name=me.data['name'])
     # return 'Logged in as id=%s name=%s languages=%s redirect=%s' % \
     #     (me.data['id'], me.data['name'], me.data['languages'], request.args.get('next'))
