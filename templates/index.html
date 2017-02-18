@@ -1,1 +1,64 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#update_learn').submit(function(event) {
+
+            /* prevent form from submitting normally */
+            event.preventDefault()
+
+            /* get the action attribute from the <form action=""> element */
+            var $form = $( this ),
+                url = $form.attr( 'action' );
+			
+            /* send the post request */
+            $.post( 'updateLearn', $('form').serializeArray(),
+            function(data, status) {
+                $.get('languagesToLearn', function(data, status) {
+                    $('#languagesToLearn').text(data);
+                });
+            });
+        });
+
+        $.get('languagesToLearn', function(data, status) {
+            $('#languagesToLearn').text(data);
+        });
+
+		$.get('matches', function(data, status) {
+			$('#matches').text(data);
+		});
+	});
+</script>
+
 <p>Welcome, {{ user.name }}!</p>
+
+{% for message in get_flashed_messages() %}
+<div class="flash">
+{{ message }}
+</div>
+{% endfor %}
+
+<div>
+<h2>Languages I know:</h2>
+<ul>
+{% for language in all_languages %}
+<li>{{ language.name }}</li>
+{% endfor %}
+</ul>
+</div>
+
+<div>
+<form action="{{ url_for('update_learn') }}" method="post">
+<h2>Languages I want to learn:</h2>
+<p id="languagesToLearn"></p>
+
+{% for language in all_languages %}
+<input type="checkbox" value={{ language.id }} name="learnLanguages">{{ language.name }}<br>
+{% endfor %}
+<input type="submit" value="Update" id="update_learn">
+</form>
+</div>
+
+<h2>Matches</h2>
+<div id='matches'>
+No matches found.
+</div>
