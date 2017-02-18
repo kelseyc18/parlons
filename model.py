@@ -24,6 +24,7 @@ class Language(Base):
     name = Column(String)
     language_id = Column(Integer, unique=True)
     users = relationship('LanguageAssociation', back_populates='language')
+    learningUsers = relationship('LearningLanguageAssociation', back_populates='language')
 
 class LanguageAssociation(Base):
     __tablename__ = 'languageAssociation'
@@ -36,5 +37,5 @@ class LearningLanguageAssociation(Base):
     __tablename__ = 'learningLanguageAssociation'
     language_id = Column(Integer, ForeignKey('language.id'), primary_key=True)
     user_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
-    language = relationship('Language', back_populates='users')
+    language = relationship('Language', back_populates='learningUsers')
     user = relationship('User', back_populates='learningLanguages')
