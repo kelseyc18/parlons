@@ -2,6 +2,7 @@ from flask import Flask, redirect, url_for, request, render_template, flash
 from flask import session as login_session
 from flask_oauth import OAuth
 from model import *
+import json
 
 SECRET_KEY = 'development key'
 DEBUG = True
@@ -21,7 +22,7 @@ facebook = oauth.remote_app('facebook',
     authorize_url='https://www.facebook.com/dialog/oauth',
     consumer_key=FACEBOOK_APP_ID,
     consumer_secret=FACEBOOK_APP_SECRET,
-    request_token_params={'scope': ['email', 'user_likes']}
+    request_token_params={'scope': ['email', 'user_likes', 'user_hometown', 'user_location']}
 )
 
 engine = create_engine('sqlite:///database.db')
@@ -62,7 +63,7 @@ def facebook_authorized(resp):
             request.args['error_description']
         )
     login_session['oauth_token'] = (resp['access_token'], '')
-    me = facebook.get('/me?fields=id,name,languages,email')
+    me = facebook.get('/me?fields=id,name,languages,email,location,hometown')
     login_session['facebook_id'] = me.data['id']
 
     # Create new User if necessary
@@ -81,6 +82,12 @@ def facebook_authorized(resp):
         user = User(name=me.data['name'], facebook_id=me.data['id'])
         if 'email' in me.data:
             user.email = me.data['email']
+        if 'hometown' in me.data:
+            user.hometown = me.data['hometown']['name']
+        if 'location' in me.data:
+            user.location = me.data['location']['name']
+        session.add(user)
+        session.commit()
         for my_language in my_languages:
             languageAssociation = LanguageAssociation(user=user, language=my_language)
             session.add(languageAssociation)
@@ -104,17 +111,16 @@ def logout():
 
 @app.route('/matches')
 def matches():
-    if session.query(User).first() is not None:
-        # TODO: actually return matches
-        return session.query(User).first().name
-    return ''
+    # TODO: does not work. need to rewrite matching algorithm
+    users = session.query(User).all()
+    return ', '.join([user.name for user in users])
 
 
 @app.route('/languagesToLearn')
 def languages_to_learn():
     user = session.query(User).filter_by(facebook_id=login_session['facebook_id']).one()
     languages = [assoc.language for assoc in user.learningLanguages]
-    return ', '.join([language.name for language in languages])
+    return json.dumps([language.name for language in languages])
 
 
 @app.route('/updateLearn', methods = ['POST'])

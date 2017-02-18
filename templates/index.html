@@ -11,16 +11,15 @@
                 url = $form.attr( 'action' );
 			
             /* send the post request */
-            $.post( 'updateLearn', $('form').serializeArray(),
-            function(data, status) {
-                $.get('languagesToLearn', function(data, status) {
-                    $('#languagesToLearn').text(data);
-                });
-            });
+            $.post( 'updateLearn', $('form').serializeArray());
         });
 
-        $.get('languagesToLearn', function(data, status) {
-            $('#languagesToLearn').text(data);
+        $.getJSON('languagesToLearn', function(data, status) {
+            $('#languagesToLearn .list li').remove();
+
+            $.each(data, function(key, val) {
+                $('#languagesToLearn .list').append('<li>' + val + '</li>')
+            });
         });
 
 		$.get('matches', function(data, status) {
@@ -30,6 +29,8 @@
 </script>
 
 <p>Welcome, {{ user.name }}!</p>
+<p>Hometown: {{ user.hometown }}</p>
+<p>Location: {{ user.location }}</p>
 
 {% for message in get_flashed_messages() %}
 <div class="flash">
@@ -49,7 +50,11 @@
 <div>
 <form action="{{ url_for('update_learn') }}" method="post">
 <h2>Languages I want to learn:</h2>
-<p id="languagesToLearn"></p>
+<div id="languagesToLearn">
+    <ul class="list">
+        
+    </ul>
+</div>
 
 {% for language in all_languages %}
 <input type="checkbox" value={{ language.id }} name="learnLanguages">{{ language.name }}<br>

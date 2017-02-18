@@ -15,6 +15,8 @@ class User(Base):
     name = Column(String(255))
     email = Column(String(255), unique=True)
     facebook_id = Column(Integer)
+    location = Column(String)
+    hometown = Column(String)
     languages = relationship('LanguageAssociation', back_populates='user')
     learningLanguages = relationship('LearningLanguageAssociation', back_populates='user')
 
