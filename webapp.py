@@ -66,7 +66,9 @@ def facebook_authorized(resp):
                     session.add(currLanguage)
                     session.commit()
                 my_languages.append(currLanguage)
-        user = User(name=me.data['name'], email=me.data['email'], facebook_id=me.data['id'])
+        user = User(name=me.data['name'], facebook_id=me.data['id'])
+        if 'email' in me.data:
+            user.email = me.data['email']
         for my_language in my_languages:
             languageAssociation = LanguageAssociation(user=user, language=my_language)
             session.add(languageAssociation)
