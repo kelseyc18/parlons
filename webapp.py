@@ -46,8 +46,9 @@ def facebook_authorized(resp):
         )
     session['oauth_token'] = (resp['access_token'], '')
     me = facebook.get('/me?fields=id,name,languages')
-    return 'Logged in as id=%s name=%s languages=%s redirect=%s' % \
-        (me.data['id'], me.data['name'], me.data['languages'], request.args.get('next'))
+    return render_template('index.html', name=me.data['name'])
+    # return 'Logged in as id=%s name=%s languages=%s redirect=%s' % \
+    #     (me.data['id'], me.data['name'], me.data['languages'], request.args.get('next'))
 
 
 @facebook.tokengetter
