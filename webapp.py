@@ -42,11 +42,34 @@ def my_profile():
         return redirect(url_for('login'))
     else:
         currUser = session.query(User).filter_by(facebook_id=login_session['facebook_id']).one()
+        update_user_languages(login_session['facebook_id'])
         my_languages = [assoc.language for assoc in session.query(LanguageAssociation).filter_by(user=currUser).all()]
         all_languages = session.query(Language).all()
         all_languages.sort(key=lambda language: language.name)
         return render_template('index.html', user=currUser, \
             my_languages=my_languages, all_languages=all_languages)
+
+
+def update_user_languages(facebook_id):
+    user = session.query(User).filter_by(facebook_id=login_session['facebook_id']).one()
+    session.query(LanguageAssociation).filter_by(user=user).delete()
+    my_languages = []
+    me = facebook.get('/me?fields=languages')
+    if 'languages' in me.data:
+        languages = me.data['languages']
+        for language in languages:
+            currLanguage = session.query(Language).filter_by(name=language['name']).first()
+            # Create new Language if necessary
+            if currLanguage is None:
+                currLanguage = Language(name=language['name'], language_id=language['id'])
+                session.add(currLanguage)
+                session.commit()
+            my_languages.append(currLanguage)
+    for my_language in my_languages:
+        languageAssociation = LanguageAssociation(user=user, language=my_language)
+        session.add(languageAssociation)
+        session.commit()
+
 
 @app.route('/login')
 def login():
