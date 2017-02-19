@@ -38,10 +38,11 @@ def index():
 
 @app.route('/me')
 def my_profile():
-    if 'oauth_token' not in login_session or login_session['oauth_token'] == '':
+    if 'oauth_token' not in login_session or login_session['oauth_token'] == '' or \
+        session.query(User).filter_by(facebook_id=login_session['facebook_id']).first() is None:
         return redirect(url_for('login'))
     else:
-        currUser = session.query(User).filter_by(facebook_id=login_session['facebook_id']).one()
+        currUser = session.query(User).filter_by(facebook_id=login_session['facebook_id']).first()
         my_languages = [assoc.language for assoc in session.query(LanguageAssociation).filter_by(user=currUser).all()]
         all_languages = session.query(Language).all()
         all_languages.sort(key=lambda language: language.name)
