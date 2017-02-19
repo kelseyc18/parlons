@@ -38,8 +38,7 @@ def index():
 
 @app.route('/me')
 def my_profile():
-    if 'oauth_token' not in login_session or login_session['oauth_token'] == '' or \
-        session.query(User).filter_by(facebook_id=login_session['facebook_id']).first() is None:
+    if 'oauth_token' not in login_session or login_session['oauth_token'] == '' or session.query(User).filter_by(facebook_id=login_session['facebook_id']).first() is None:
         return redirect(url_for('login'))
     else:
         currUser = session.query(User).filter_by(facebook_id=login_session['facebook_id']).first()
