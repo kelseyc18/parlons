@@ -34,7 +34,7 @@ session = DBSession()
 
 @app.route('/')
 def index():
-    return redirect(url_for('login'))
+    return render_template('start.html')
 
 @app.route('/me')
 def my_profile():
@@ -149,7 +149,13 @@ def matches():
     sorted_users = []
     for u in sorted(user_dict, key=user_dict.get, reverse=True):
         sorted_users.append((u, user_dict[u]))
-    return json.dumps([{'name': user.name, 'score': score, 'facebook_id': user.facebook_id} for (user, score) in sorted_users])
+    return json.dumps([{
+        'name': user.name, 
+        'score': score, 
+        'facebook_id': user.facebook_id,
+        'languages': [assoc.language.name for assoc in user.languages],
+        'learningLanguages': [assoc.language.name for assoc in user.learningLanguages]
+        } for (user, score) in sorted_users])
 
 
 @app.route('/languagesToLearn')

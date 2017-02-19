@@ -1,6 +1,6 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.12/css/uikit.min.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.12/js/uikit.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://getuikit.com/assets/uikit/dist/css/uikit.css?nc=1551" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://getuikit.com/assets/uikit/dist/js/uikit.js?nc=1551"></script>
 <script>
     function get_profile_url(facebook_id) {
         return 'https://facebook.com/' + facebook_id
@@ -29,22 +29,43 @@
         });
 
         $.getJSON('matches', function(data, status) {
-            $('#matches .list li').remove();
+            $('#matches div').remove();
 
             $.each(data, function(key, val) {
-                $('#matches .list').append('<li><a href="' + get_profile_url(val['facebook_id']) + '">' + val['name'] + ' (' + val['score'] + ')</a></li>')
+                var cardHTML = '<div><div class="uk-card uk-card-body uk-card-default">' +
+                '<h3 class="uk-card-title">' + val['name'] + '</h3><p>Score: ' + val['score'] + '</p>'
+                + '<h4>Knows</h4><ul>';
+                $.each(val['languages'], function(index, language) {
+                    cardHTML = cardHTML + '<li>' + language + '</li>'
+                });
+                if (val['languages'] == 0) cardHTML += '<i>None</i>';
+                cardHTML = cardHTML + '</ul><h4>Learning</h4><ul>';
+                $.each(val['learningLanguages'], function(index, language) {
+                    cardHTML = cardHTML + '<li>' + language + '</li>'
+                });
+                if (val['learningLanguages'] == 0) cardHTML += '<i>None</i>';
+                cardHTML = cardHTML + '</ul><a href="' + get_profile_url(val['facebook_id']) + '"><p>View Profile</a></p></div></div>';
+                $('#matches').append(cardHTML);
             });
         });
 	});
 </script>
-<title>Lang</title>
+<title>Parlons</title>
 
-<div class="uk-container">
-<h1 class="uk-heading-primary">Lang</h1>
+<nav class="uk-navbar-container" uk-navbar>
+    <div class="uk-navbar-left">
+    <a class="uk-navbar-item uk-logo" href="#">Parlons</a>
+    </div>
+    <div class="uk-navbar-right">
+    <ul class="uk-navbar-nav">
+        <li class="uk-active"><a href="{{ url_for('logout') }}">Signout</a></li>
+    </ul>
+    </div>
+</nav>
+<div class="uk-container" style="padding: 40px">
 
 <p>Welcome, {{ user.name }}!</p>
-<p>Hometown: {{ user.hometown }}</p>
-<p>Location: {{ user.location }}</p>
+<p>Hometown: {{ user.hometown }}<br>Location: {{ user.location }}</p>
 
 {% for message in get_flashed_messages() %}
 <div class="flash">
@@ -53,7 +74,7 @@
 {% endfor %}
 
 <div class="uk-grid uk-grid-match" uk-grid>
-<div class="uk-width-1-3@m">
+<div class="uk-width-1-3@s">
     <div class="uk-card uk-card-body uk-card-default">
     <h2 class="uk-card-title">Languages I know</h2>
     <ul>
@@ -61,11 +82,7 @@
     <li>{{ language.name }}</li>
     {% endfor %}
     </ul>
-    </div>
-</div>
 
-<div class="uk-width-1-3@m">
-    <div class="uk-card uk-card-body uk-card-default">
     <form action="{{ url_for('update_learn') }}" method="post">
     <h2 class="uk-card-title">Languages I want to learn</h2>
     <div id="languagesToLearn">
@@ -82,14 +99,9 @@
     </div>
 </div>
 
-<div class="uk-width-1-3@m">
-    <div class="uk-card uk-card-body uk-card-default">
-    <h2 class="uk-card-title">Matches</h2>
-    <div id='matches'>
-        <ul class="list">
-
-        </ul>
-    </div>
+<div class="uk-width-2-3@s">
+    <div id="matches" class="uk-grid-small uk-child-width-1-2@s uk-child-width-1-3@m" uk-grid>
+        
     </div>
 </div>
 </div>
