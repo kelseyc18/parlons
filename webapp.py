@@ -154,7 +154,9 @@ def matches():
         'score': score, 
         'facebook_id': user.facebook_id,
         'languages': [assoc.language.name for assoc in user.languages],
-        'learningLanguages': [assoc.language.name for assoc in user.learningLanguages]
+        'learningLanguages': [assoc.language.name for assoc in user.learningLanguages],
+        'hometown': user.hometown,
+        'location': user.location
         } for (user, score) in sorted_users])
 
 

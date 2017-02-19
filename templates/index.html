@@ -1,5 +1,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://getuikit.com/assets/uikit/dist/css/uikit.css?nc=1551" />
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <script src="https://getuikit.com/assets/uikit/dist/js/uikit.js?nc=1551"></script>
 <script>
@@ -34,13 +35,15 @@
 
             $.each(data, function(key, val) {
                 var cardHTML = '<div><div class="uk-card uk-card-body uk-card-default">' +
-                '<h3 class="uk-card-title">' + val['name'] + '</h3><p>Score: ' + val['score'] + '</p>'
-                + '<h4>Knows</h4><ul>';
+                '<h3 class="uk-card-title">' + val['name'] + '</h3><p>Score: ' + val['score'];
+                if (val['hometown'] != null) cardHTML = cardHTML += '<br>Hometown: ' + val['hometown'];
+                if (val['location'] != null) cardHTML = cardHTML += '<br>Location: ' + val['location'];
+                cardHTML = cardHTML + '</p><h4 class="language-title">Knows</h4><ul class="language-list">';
                 $.each(val['languages'], function(index, language) {
                     cardHTML = cardHTML + '<li>' + language + '</li>'
                 });
                 if (val['languages'] == 0) cardHTML += '<i>None</i>';
-                cardHTML = cardHTML + '</ul><h4>Learning</h4><ul>';
+                cardHTML = cardHTML + '</ul><h4 class="language-title">Learning</h4><ul class="language-list">';
                 $.each(val['learningLanguages'], function(index, language) {
                     cardHTML = cardHTML + '<li>' + language + '</li>'
                 });
@@ -66,7 +69,12 @@
 <div class="uk-container" style="padding: 40px">
 
 <p>Welcome, {{ user.name }}!</p>
-<p>Hometown: {{ user.hometown }}<br>Location: {{ user.location }}</p>
+{% if user.hometown %}
+<p>Hometown: {{ user.hometown }}<br>
+{% endif %}
+{% if user.location %}
+Location: {{ user.location }}</p>
+{% endif %}
 
 {% for message in get_flashed_messages() %}
 <div class="flash">
