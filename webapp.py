@@ -74,7 +74,7 @@ def facebook_authorized(resp):
         if 'languages' in me.data:
             languages = me.data['languages']
             for language in languages:
-                currLanguage = session.query(Language).filter_by(language_id=language['id']).first()
+                currLanguage = session.query(Language).filter_by(name=language['name']).first()
                 # Create new Language if necessary
                 if currLanguage is None:
                     currLanguage = Language(name=language['name'], language_id=language['id'])
